@@ -15,11 +15,11 @@ class test_swt(unittest.TestCase):
         self.basedir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
         self.photodir = os.path.join(self.basedir,"photos")
         self.photooutdir = os.path.join(self.basedir, "photos-out")
-        print "setup"
+        print ("setup")
 
     def tearDown(self):
         #self.widget.dispose()
-        print "teardown"
+        print ("teardown")
 
     def test_swt(self):
         cv2.IMREAD_GRAYSCALE
