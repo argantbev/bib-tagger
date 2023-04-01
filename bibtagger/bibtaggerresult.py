@@ -1,5 +1,5 @@
-import find_bibs as bf
-import bibtagger as bt
+from . import find_bibs as bf
+from . import bibtagger as bt
 import cv2
 import numpy as np
 

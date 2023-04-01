@@ -6,13 +6,13 @@ from collections import defaultdict
 
 import math
 import os
-import time
+from time import process_time
 
 import numpy as np
 import cv2
 import scipy.sparse, scipy.spatial
 
-t0 = time.clock()
+t0 = process_time()
 
 diagnostics = False
 
@@ -68,7 +68,7 @@ class SWTScrubber(object):
         swt[:] = np.Infinity
         rays = []
 
-        print time.clock() - t0
+        print(process_time() - t0)
 
         # now iterate over pixels in image, checking Canny to see if we're on an edge.
         # if we are, follow a normal a ray to either the next edge or image border
@@ -290,7 +290,7 @@ class SWTScrubber(object):
                 continue
 
             if diagnostics:
-                print " written to image."
+                print(" written to image.")
                 cv2.imwrite('layer'+ str(label) +'.jpg', layer * 255)
 
             # we use log_base_2 so we can do linear distance comparison later using k-d tree

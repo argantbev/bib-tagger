@@ -1,44 +1,45 @@
 import cv2
 import numpy as np
 
-DEBUG=False
+DEBUG=True
 
 #
 # Takes an input image which is assumed to only have one bib and returns the
 # four corners of the bib in the form of an opencv contour (vector of points,
 # i.e vector((x1,y1),(x2,y2),(x3,y3),(x4,y4)) )
 #
-def find_bib(image):
+def find_bib(image,outdir):
   width, height, depth = image.shape
+  potential_bibs = []
 
   gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY);
   #gray = cv2.equalizeHist(gray)
   blurred = cv2.GaussianBlur(gray,(5,5),0)
 
-  debug_output("find_bib_blurred", blurred)
+  debug_output(f"{outdir}/find_bib_blurred", blurred)
   #binary = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, blockSize=25, C=0);
   ret,binary = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU);
   #ret,binary = cv2.threshold(blurred, 170, 255, cv2.THRESH_BINARY);
-  debug_output("find_bib_binary", binary)
+  debug_output(f"{outdir}/find_bib_binary", binary)
   threshold_contours,hierarchy = find_contours(binary)
 
-  debug_output("find_bib_threshold", binary)
+  debug_output(f"{outdir}/find_bib_threshold", binary)
 
   edges = cv2.Canny(gray,175,200, 3)
   edge_contours,hierarchy = find_contours(edges)
 
-  debug_output("find_bib_edges", edges)
+  debug_output(f"{outdir}/find_bib_edges", edges)
 
   contours = threshold_contours + edge_contours
-  debug_output_contours("find_bib_threshold_contours", image, contours)
+  debug_output_contours(f"{outdir}/find_bib_threshold_contours", image, contours)
 
   rectangles = get_rectangles(contours)
 
-  debug_output_contours("find_bib_rectangles", image, rectangles)
+  debug_output_contours(f"{outdir}/find_bib_rectangles", image, rectangles)
 
   potential_bibs = [rect for rect in rectangles if is_potential_bib(rect, width*height)]
 
-  debug_output_contours("find_bib_potential_bibs", image, potential_bibs)
+  debug_output_contours(f"{outdir}/find_bib_potential_bibs", image, potential_bibs)
 
   ideal_aspect_ratio = 1.0
   potential_bibs = sorted(potential_bibs, key = lambda bib: abs(aspect_ratio(bib) - ideal_aspect_ratio))
@@ -142,7 +143,7 @@ def find_blobs(img):
      
     # Detect blobs.
     keypoints = detector.detect(img)
-    print keypoints
+    print(keypoints)
       
     # Draw detected blobs as red circles.
     # cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS ensures the size of the circle corresponds to the size of blob
@@ -159,10 +160,10 @@ def find_keypoints(img):
   img2 = cv2.drawKeypoints(img, kp, color=(255,0,0))
 
   # Print all default params
-  print "Threshold: ", fast.getInt('threshold')
-  print "nonmaxSuppression: ", fast.getBool('nonmaxSuppression')
-  #print "neighborhood: ", fast.getInt('type')
-  print "Total Keypoints with nonmaxSuppression: ", len(kp)
+  print("Threshold: ", fast.getInt('threshold'))
+  print("nonmaxSuppression: ", fast.getBool('nonmaxSuppression'))
+  #print("neighborhood: ", fast.getInt('type'))
+  print("Total Keypoints with nonmaxSuppression: ", len(kp))
 
   cv2.imwrite('fast_true.png',img2)
 

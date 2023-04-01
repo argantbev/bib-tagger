@@ -13,18 +13,18 @@ class testfeaturedetector(unittest.TestCase):
     def setUp(self):
         #self.widget = Widget('The widget')
         self.basedir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-        print self.basedir
+        print(self.basedir)
         self.photodir = os.path.join(self.basedir,"photos")
         self.photooutdir = os.path.join(self.basedir, "photos-out")
-        print "setup"
+        print("setup")
 
     def tearDown(self):
         #self.widget.dispose()
-        print "teardown"
+        print("teardown")
 
     def test_featuredetector(self):
 
-        print self.photodir
+        print(self.photodir)
 
         #read in images
         images = []
@@ -40,7 +40,7 @@ class testfeaturedetector(unittest.TestCase):
             output = fd.drawMatches(bib, bib_kp, image, image_kp, matches)
 
             ftoutdir = os.path.join(self.photooutdir,"features")
-            print "Writing images to folder {}".format(ftoutdir)
+            print("Writing images to folder {}".format(ftoutdir))
 
             if not os.path.exists(ftoutdir):
                 os.makedirs(ftoutdir)

@@ -14,11 +14,11 @@ class testbibtagger(unittest.TestCase):
         self.basedir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
         self.photodir = os.path.join(self.basedir,"photos")
         self.photooutdir = os.path.join(self.basedir, "photos-out")
-        print "Test Setup"
+        print("Test Setup")
 
     def tearDown(self):
         #self.widget.dispose()
-        print "Test Teardown"
+        print("Test Teardown")
 
     def test_findBibs(self):
         #image = cv2.imread(os.path.join(self.photodir,"Frosty5k","1.jpg"))

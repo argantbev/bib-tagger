@@ -1,13 +1,13 @@
 import cv2
 import os
 import numpy as np
-import bodydetector as bt
-import find_bibs as bf
-from bib import Bib
-from bibtaggerresult import BibTaggerResult
+from . import bodydetector as bd
+from . import find_bibs as bf
+from .bib import Bib
+from .bibtaggerresult import BibTaggerResult
 
-from swt import SWTScrubber
-import ocr
+from .swt import SWTScrubber
+from . import ocr
 import re
 
 def findBibs(image,outdir):
@@ -20,18 +20,18 @@ def findBibs(image,outdir):
         if not os.path.exists(outdir):
             os.makedirs(outdir)
 
-    bodyboxes = bt.getbodyboxes(image)
-
-    print "Found {} bodies!".format(len(bodyboxes))
+    bodyboxes = bd.getbodyboxes(image)
+    print("Found {} bodies!".format(len(bodyboxes)))
 
     #draw bodyboxes on image, and write out
     imagecopy = np.copy(image)
     drawboxes(imagecopy,bodyboxes)
+
     if(writefiles):
         cv2.imwrite(os.path.join(outdir,"0_0bodyboxes.jpg"), imagecopy)
 
     # Creates a list of Bibs
-    bibs = [ Bib(image, bodybox) for bodybox in bodyboxes ]
+    bibs = [ Bib(image, bodybox, outdir) for bodybox in bodyboxes ]
 
     # Write out subimages, with bibs outlined
     if(writefiles):
@@ -71,8 +71,8 @@ def findBibs(image,outdir):
             if (SWTbib is not None):
                 swtsuccesses += 1
 
-        except Bib:
-            print "SWT failed"
+        except:
+            print("SWT failed")
 
     result = BibTaggerResult()
     result.faces = len(bodyboxes)
@@ -80,7 +80,7 @@ def findBibs(image,outdir):
     result.swt = swtsuccesses
     result.bib_numbers = [ bib.number for bib in bibs if bib.has_bib_number() ]
 
-    print result
+    print(result)
 
     return result
 
@@ -96,7 +96,7 @@ def run_swt_and_ocr(image, i, name, writefiles, outdir):
         SWTpath = os.path.join(outdir,"{}_3SWTimage_{}.jpg".format(i, name))
         cv2.imwrite(SWTpath, (255-(255*SWTbib)))
         bib_number = ocr.getOcr(SWTpath)
-        print bib_number
+        print(bib_number)
         bib_number = re.sub("[^0-9]", "", bib_number)
 
     return bib_number

@@ -1,13 +1,14 @@
-import find_bibs as bf
-import bibtagger as bt
+from . import find_bibs as bf
+from . import bibtagger as bt
 import cv2
 import numpy as np
 
 class Bib(object):
-    def __init__(self, image, bodybox):
+    def __init__(self, image, bodybox,outdir):
         self.image = image
         self.bodybox = bodybox
-        self.corners = bf.find_bib(self.body_image())
+        self.outdir = outdir
+        self.corners = bf.find_bib(self.body_image(),outdir)
         x,y,w,h = cv2.boundingRect(self.corners)
         self.bib_found = (x != 0 and y != 0 and w != 1 and h != 1)
         self.number = None
