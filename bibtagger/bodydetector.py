@@ -19,10 +19,10 @@ PROFILES = {
     'HAAR_FRONTALFACE_ALT2': 'haarcascades/haarcascade_frontalface_alt2.xml',
 }
 
-
 # Face normalization
 NORM_SIZE = 100
 NORM_MARGIN = 10
+
 
 # Support functions
 def error(msg):
@@ -46,8 +46,8 @@ def load_cascades(data_dir):
 
 
 def crop_rect(im, rect, shave=0):
-    return im[rect[1]+shave:rect[1]+rect[3]-shave,
-              rect[0]+shave:rect[0]+rect[2]-shave]
+    return im[rect[1] + shave:rect[1] + rect[3] - shave,
+           rect[0] + shave:rect[0] + rect[2] - shave]
 
 
 def shave_margin(im, margin):
@@ -158,13 +158,14 @@ def pairwise_similarity(im, features, template, **mssim_args):
         roi = np.float32(roi) / 255
         yield mssim_norm(roi, template, **mssim_args)
 
+
 def getbodyboxes(image):
-    #in: numpy image
-    #out: list [(x,y,width,height)]
+    # in: numpy image
+    # out: list [(x,y,width,height)]
 
     faces = findfaces(image)
 
-    bodyrectangles = findbodies(image,faces)
+    bodyrectangles = findbodies(image, faces)
 
     return bodyrectangles
 
@@ -176,26 +177,26 @@ def findfaces(image):
     features = face_detect(im)
     return features
 
+
 def scale_rect(rect, scale):
-    return [int(value*scale) for value in rect]
+    return [int(value * scale) for value in rect]
+
 
 def findbodies(image, faces):
-
     bodies = np.zeros_like(faces)
     bodiesindex = 0
 
-    #for each face, draw a body
+    # for each face, draw a body
     for (x, y, facewidth, faceheight) in faces:
-        #3*faceheight, 7/3 * facewidth, .5*faceheight below the face.
+        # 3*faceheight, 7/3 * facewidth, .5*faceheight below the face.
         bodyheight = 4 * faceheight
-        bodywidth = 7/3 * facewidth
+        bodywidth = 7 / 3 * facewidth
         y_body = y + faceheight + .5 * faceheight
         x_body = x + .5 * facewidth - .5 * bodywidth
 
-        bodies[bodiesindex] = (x_body,y_body, bodywidth, bodyheight)
+        bodies[bodiesindex] = (x_body, y_body, bodywidth, bodyheight)
         bodiesindex = bodiesindex + 1
         bodies = bodies.clip(min=0)
-        #cv2.rectangle(image, (x_body, y_body), (x_body+bodywidth, y_body+bodyheight), (0, 255, 0), 2)
+        # cv2.rectangle(image, (x_body, y_body), (x_body+bodywidth, y_body+bodyheight), (0, 255, 0), 2)
 
     return bodies
-

@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-#Adapted from: https://github.com/mypetyak/StrokeWidthTransform/blob/master/swt.py 4/23/16
+# Adapted from: https://github.com/mypetyak/StrokeWidthTransform/blob/master/swt.py 4/23/16
 
 from __future__ import division
 from collections import defaultdict
@@ -33,8 +33,8 @@ class SWTScrubber(object):
         swt = cls._swt(theta, canny, sobelx, sobely)
         shapes = cls._connect_components(swt)
         swts, heights, widths, topleft_pts, images = cls._find_letters(swt, shapes)
-        if(len(swts)==0):
-            #didn't find any text, probably a bad face
+        if (len(swts) == 0):
+            # didn't find any text, probably a bad face
             return None
 
         word_images = cls._find_words(swts, heights, widths, topleft_pts, images)
@@ -48,16 +48,16 @@ class SWTScrubber(object):
     def _create_derivative(cls, img):
         edges = cv2.Canny(img, 175, 320, apertureSize=3)
         # Create gradient map using Sobel
-        sobelx64f = cv2.Sobel(img,cv2.CV_64F,1,0,ksize=-1)
-        sobely64f = cv2.Sobel(img,cv2.CV_64F,0,1,ksize=-1)
+        sobelx64f = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=-1)
+        sobely64f = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=-1)
 
         theta = np.arctan2(sobely64f, sobelx64f)
         if diagnostics:
-            cv2.imwrite('edges.jpg',edges)
+            cv2.imwrite('edges.jpg', edges)
             cv2.imwrite('sobelx64f.jpg', np.absolute(sobelx64f))
             cv2.imwrite('sobely64f.jpg', np.absolute(sobely64f))
             # amplify theta for visual inspection
-            theta_visible = (theta + np.pi)*255/(2*np.pi)
+            theta_visible = (theta + np.pi) * 255 / (2 * np.pi)
             cv2.imwrite('theta.jpg', theta_visible)
         return (edges, sobelx64f, sobely64f, theta)
 
@@ -75,7 +75,7 @@ class SWTScrubber(object):
         # edgesSparse = scipy.sparse.coo_matrix(edges)
         step_x_g = -1 * sobelx64f
         step_y_g = -1 * sobely64f
-        mag_g = np.sqrt( step_x_g * step_x_g + step_y_g * step_y_g )
+        mag_g = np.sqrt(step_x_g * step_x_g + step_y_g * step_y_g)
         grad_x_g = step_x_g / mag_g
         grad_y_g = step_y_g / mag_g
 
@@ -113,8 +113,8 @@ class SWTScrubber(object):
                                         val = -1.0
                                     if (val > 1.0):
                                         val = 1.0
-                                    if math.acos(val) < np.pi/2.0:
-                                        thickness = math.sqrt( (cur_x - x) * (cur_x - x) + (cur_y - y) * (cur_y - y) )
+                                    if math.acos(val) < np.pi / 2.0:
+                                        thickness = math.sqrt((cur_x - x) * (cur_x - x) + (cur_y - y) * (cur_y - y))
                                         for (rp_x, rp_y) in ray:
                                             swt[rp_y, rp_x] = min(thickness, swt[rp_y, rp_x])
                                         rays.append(ray)
@@ -146,11 +146,13 @@ class SWTScrubber(object):
                 self.value = value
                 self.parent = self
                 self.rank = 0
+
             def __eq__(self, other):
                 if type(other) is type(self):
                     return self.value == other.value
                 else:
                     return False
+
             def __ne__(self, other):
                 return not self.__eq__(other)
 
@@ -206,10 +208,10 @@ class SWTScrubber(object):
             for x in xrange(swt.shape[1]):
                 sw_point = swt[y, x]
                 if sw_point < np.Infinity and sw_point > 0:
-                    neighbors = [(y, x-1),   # west
-                                 (y-1, x-1), # northwest
-                                 (y-1, x),   # north
-                                 (y-1, x+1)] # northeast
+                    neighbors = [(y, x - 1),  # west
+                                 (y - 1, x - 1),  # northwest
+                                 (y - 1, x),  # north
+                                 (y - 1, x + 1)]  # northeast
                     connected_neighbors = None
                     neighborvals = []
 
@@ -267,7 +269,7 @@ class SWTScrubber(object):
         topleft_pts = []
         images = []
 
-        for label,layer in shapes.iteritems():
+        for label, layer in shapes.iteritems():
             (nz_y, nz_x) = np.nonzero(layer)
             east, west, south, north = max(nz_x), min(nz_x), max(nz_y), min(nz_y)
             width, height = east - west, south - north
@@ -291,7 +293,7 @@ class SWTScrubber(object):
 
             if diagnostics:
                 print(" written to image.")
-                cv2.imwrite('layer'+ str(label) +'.jpg', layer * 255)
+                cv2.imwrite('layer' + str(label) + '.jpg', layer * 255)
 
             # we use log_base_2 so we can do linear distance comparison later using k-d tree
             # ie, if log2(x) - log2(y) > 1, we know that x > 2*y
@@ -308,9 +310,9 @@ class SWTScrubber(object):
     def _find_words(cls, swts, heights, widths, topleft_pts, images):
         # Find all shape pairs that have similar median stroke widths
 
-        #print 'SWTS'
-        #print swts
-        #print 'DONESWTS'
+        # print 'SWTS'
+        # print swts
+        # print 'DONESWTS'
 
         swt_tree = scipy.spatial.KDTree(np.asarray(swts))
         stp = swt_tree.query_pairs(1)
@@ -342,7 +344,7 @@ class SWTScrubber(object):
         atp = []
         if len(pair_angles) > 0:
             angle_tree = scipy.spatial.KDTree(np.asarray(pair_angles))
-            atp = angle_tree.query_pairs(np.pi/12)
+            atp = angle_tree.query_pairs(np.pi / 12)
 
         for pair_idx in atp:
             pair_a = pairs[pair_idx[0]]
